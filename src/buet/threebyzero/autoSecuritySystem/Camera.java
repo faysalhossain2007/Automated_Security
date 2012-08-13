@@ -1,6 +1,7 @@
-package buet.threebyzero.autoSecuritySystem.camera;
+package buet.threebyzero.autoSecuritySystem;
 
 import java.io.InputStream;
+
 
 import android.app.Activity;
 import android.content.Intent;
