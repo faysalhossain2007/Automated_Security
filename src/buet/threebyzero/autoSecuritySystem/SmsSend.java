@@ -6,15 +6,19 @@ import android.telephony.SmsManager;
 
 public class SmsSend extends Activity {
 	final static String emergencyHelp = "Subject is in trouble";// Subject=
-																// shop/office address
+																// shop/office
+																// address
 	String address = "5556";// it will be the number of police
-
+	boolean emergency=true;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.sms);
-		sendMessage();
+		boolean checkAlert = emergency;
+		if (checkAlert == true) {
+			sendMessage();
+		}
 	}
 
 	private void sendMessage() {
