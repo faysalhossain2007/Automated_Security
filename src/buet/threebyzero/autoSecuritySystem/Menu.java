@@ -1,4 +1,4 @@
-package buet.threebyzero.autoSecuritySystem.menu;
+package buet.threebyzero.autoSecuritySystem;
 
 
 import android.app.ListActivity;
