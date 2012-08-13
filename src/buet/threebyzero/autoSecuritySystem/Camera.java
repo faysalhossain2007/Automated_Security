@@ -43,6 +43,7 @@ public class Camera extends Activity implements View.OnClickListener {
 		iv = (ImageView) findViewById(R.id.imageView1);
 		InputStream is = getResources().openRawResource(R.drawable.ic_launcher);
 		bmp = BitmapFactory.decodeStream(is);
+		btnPic.setOnClickListener(this);
 	}
 
 	public void openCamera() {
