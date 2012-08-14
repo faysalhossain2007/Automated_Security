@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -26,6 +27,7 @@ public class Camera extends Activity implements View.OnClickListener {
 	private Intent i;
 	private String imageFileName;
 	private File albumF;
+	private static final String CAMERA = "camera";
 	final static int cameraData = 0;
 
 	/** Called when the activity is first created. */
@@ -48,12 +50,12 @@ public class Camera extends Activity implements View.OnClickListener {
 	public void openCamera() {
 		try {
 			android.hardware.Camera.open();
-			System.out.print("hello");
 		} catch (Exception aec) {
 			aec.printStackTrace();
 		}
+		Log.d(CAMERA, "Camre opened");
 	}
-	
+
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		switch (v.getId()) {
@@ -61,15 +63,14 @@ public class Camera extends Activity implements View.OnClickListener {
 			openCamera();
 			i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 			startActivityForResult(i, cameraData);
-			System.out.print("hello");
+			Log.d(CAMERA , "Picture captued");
 		}
 	}
 
 	public File fileCreate() {
 
-
 		String timeForPic = new SimpleDateFormat("yyyyMMdd_HHmmss")
-				.format(new Date());
+			.format(new Date());
 		imageFileName = "IMG_" + timeForPic;
 
 		File albumF;
@@ -82,7 +83,8 @@ public class Camera extends Activity implements View.OnClickListener {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
+		Log.d(CAMERA, "File created");
 		return imageF;
 	}
 
@@ -94,7 +96,6 @@ public class Camera extends Activity implements View.OnClickListener {
 		try {
 			out = new FileOutputStream(f);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return false;
 		}
@@ -111,6 +112,7 @@ public class Camera extends Activity implements View.OnClickListener {
 			e.printStackTrace();
 			return false;
 		}
+		Log.d(CAMERA, "Image Saved");
 		return true;
 	}
 	@Override
@@ -124,5 +126,9 @@ public class Camera extends Activity implements View.OnClickListener {
 			boolean success=saveImage();
 		}
 	}
-
+	
+	/** Returns the image captured most recently */
+	public Bitmap getImage() {
+		return bmp;
+	}
 }
