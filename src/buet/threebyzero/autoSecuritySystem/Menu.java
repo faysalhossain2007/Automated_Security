@@ -4,7 +4,6 @@ package buet.threebyzero.autoSecuritySystem;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
