@@ -1,15 +1,17 @@
 // 10 Aug 2012
 
-package Image;
+package buet.threebyzero.autoSecuritySystem;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
+import android.graphics.Bitmap;
+import android.graphics.Color;
+
 public class Comparator {
-	private BufferedImage image1;
-	private BufferedImage image2;
+	private Bitmap image1;
+	private Bitmap image2;
 
 	private static final int COLOR_DIFFERENCE_LOW = 12;
 	private static final int COLOR_DIFFERENCE_MEDIUM = 20;
@@ -23,8 +25,8 @@ public class Comparator {
 	/** Denotes the maximum amount of accepted error rate. */
 	private double tolerance = 0.05;
 
-	/** Prepares the Comparator with two {@link BufferedImage} objects */
-	public void setImages(BufferedImage image1, BufferedImage image2) {
+	/** Prepares the Comparator with two {@link Bitmap} objects */
+	public void setImages(Bitmap image1, Bitmap image2) {
 		this.image1 = image1;
 		this.image2 = image2;
 
@@ -67,14 +69,12 @@ public class Comparator {
 		for (int row=0; row<height; row++){
 			for (int col=0; col<width; col++){
 				try {
-					int rgb1 = image1.getRGB(col, row);
-					int rgb2= image2.getRGB(col + xOffset, row + yOffset);
-					Color color1 = new Color(rgb1);
-					Color color2 = new Color(rgb2);
+					int rgb1 = image1.getPixel(col, row);
+					int rgb2= image2.getPixel(col + xOffset, row + yOffset);
 
-					int redDiff = Math.abs(color1.getRed() - color2.getRed());
-					int greenDiff = Math.abs(color1.getGreen() - color2.getGreen());
-					int blueDiff = Math.abs(color1.getBlue() - color2.getBlue());
+					int redDiff = Math.abs(Color.red(rgb1) - Color.red(rgb2));
+					int greenDiff = Math.abs(Color.green(rgb1) - Color.green(rgb2));
+					int blueDiff = Math.abs(Color.blue(rgb1) - Color.blue(rgb2));
 					int totalDiff = redDiff + greenDiff + blueDiff;
 
 					if(redDiff > COLOR_DIFFERENCE_HIGH || greenDiff > COLOR_DIFFERENCE_HIGH 
