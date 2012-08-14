@@ -31,7 +31,6 @@ public class Menu extends ListActivity {
 
 	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
-		// TODO Auto-generated method stub
 		super.onListItemClick(l, v, position, id);
 		String cheese = classes[position];
 		try {

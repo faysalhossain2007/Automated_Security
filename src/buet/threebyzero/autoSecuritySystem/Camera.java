@@ -38,7 +38,6 @@ public class Camera extends Activity implements View.OnClickListener {
 	}
 
 	private void initialize() {
-		// TODO Auto-generated method stub
 		btnPic = (Button) findViewById(R.id.btnTkPic);
 		iv = (ImageView) findViewById(R.id.imageView1);
 		InputStream is = getResources().openRawResource(R.drawable.ic_launcher);
