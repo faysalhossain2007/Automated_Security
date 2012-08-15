@@ -9,62 +9,106 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
-public class Camera extends Activity implements View.OnClickListener {
-	private Button btnPic;
-	private ImageView iv;
-	private Bitmap bmp;
-	private Intent i;
+public class Capture extends Activity {
+	private Bitmap image;
 	private String imageFileName;
 	private File albumF;
+	private Camera camera;
+	private SurfaceView preview;
+	private ToggleButton controlButton;
+	private int imageNumber = 0;
+	private Timer timer;
+	
+	private static final int INTERVAL = 5000;
+	private static final int INITIAL_DELAY = 2000;
 	private static final String CAMERA = "camera";
-	final static int cameraData = 0;
-
+	
 	/** Called when the activity is first created. */
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.photo);
-		initialize();
+		preview = (SurfaceView) findViewById(R.id.preview);
+		controlButton = (ToggleButton) findViewById(R.id.controlButton);
+		controlButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if(isChecked) {
+					if(camera == null)
+						initializeCamera();
+					startCamera();
+				}
+				else
+					stopCamera();
+			}
+		});
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		controlButton.setChecked(false);
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		if(camera != null) {
+			stopCamera();
+			camera.release();
+		}
 	}
 
-	private void initialize() {
-		btnPic = (Button) findViewById(R.id.btnTkPic);
-		iv = (ImageView) findViewById(R.id.imageView1);
-		InputStream is = getResources().openRawResource(R.drawable.ic_launcher);
-		bmp = BitmapFactory.decodeStream(is);
-		btnPic.setOnClickListener(this);
-	}
-
-	public void openCamera() {
+	private void initializeCamera() {
+		camera = Camera.open();
 		try {
-			android.hardware.Camera.open();
-		} catch (Exception aec) {
-			aec.printStackTrace();
+			camera.setPreviewDisplay(preview.getHolder());
+		} catch (IOException exception) {
+			Log.e(CAMERA, "Cannot set display", exception);
 		}
-		Log.d(CAMERA, "Camre opened");
+		Log.d(CAMERA, "Camera initialized");
 	}
-
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		switch (v.getId()) {
-		case R.id.btnTkPic:
-			openCamera();
-			i = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-			startActivityForResult(i, cameraData);
-			Log.d(CAMERA , "Picture captued");
-		}
+	
+	public void startCamera() {
+		camera.startPreview();
+		timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			
+			@Override
+			public void run() {
+				camera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
+					
+					public void onPreviewFrame(byte[] data, Camera camera) {
+						camera.takePicture(null, null, new PictureProcessor());
+					}
+				});
+			}
+		}, INITIAL_DELAY, INTERVAL);
+	}
+	
+	public void stopCamera() {
+		timer.cancel();
+		camera.stopPreview();
 	}
 
 	public File fileCreate() {
@@ -102,7 +146,7 @@ public class Camera extends Activity implements View.OnClickListener {
 		byte buf[] = new byte[1024];
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+		image.compress(Bitmap.CompressFormat.PNG, 100, stream);
 		byte[] byteArray = stream.toByteArray();
 
 		try {
@@ -115,20 +159,19 @@ public class Camera extends Activity implements View.OnClickListener {
 		Log.d(CAMERA, "Image Saved");
 		return true;
 	}
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		super.onActivityResult(requestCode, resultCode, data);
-		if (resultCode == RESULT_OK) {
-			Bundle extras = data.getExtras();
-			bmp = (Bitmap) extras.get("data");
-			iv.setImageBitmap(bmp);
-			boolean success=saveImage();
-		}
-	}
 	
 	/** Returns the image captured most recently */
 	public Bitmap getImage() {
-		return bmp;
+		return image;
+	}
+	
+	private class PictureProcessor implements PictureCallback{							
+		public void onPictureTaken(byte[] data, Camera camera) {
+			image = BitmapFactory.decodeByteArray(data, 0, data.length);
+			Log.d(CAMERA, "Image captured: " + imageNumber);
+			Toast.makeText(getApplicationContext(), "Image: " + imageNumber, Toast.LENGTH_SHORT).show();
+			imageNumber++;
+			camera.startPreview();
+		}
 	}
 }

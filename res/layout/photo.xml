@@ -3,18 +3,17 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical" >
-
-    <Button
-        android:id="@+id/btnTkPic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TakePic" />
-
-    <ImageView
-        android:id="@+id/imageView1"
+
+    <SurfaceView
+        android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.67"
-        android:src="@android:drawable/alert_light_frame" />
+        android:layout_weight="1" />
+
+    <ToggleButton
+        android:id="@+id/controlButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ToggleButton" android:textOn="Stop" android:textOff="Start"/>
 
 </LinearLayout>
