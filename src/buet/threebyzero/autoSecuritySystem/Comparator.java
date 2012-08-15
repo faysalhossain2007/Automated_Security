@@ -21,7 +21,7 @@ public class Comparator {
 	private int height;
 
 	/** Denotes the maximum amount of possible displacement between two images in pixels. */
-	private int shakeLevel = 0;
+	private int shakeLevel = 2;
 	/** Denotes the maximum amount of accepted error rate. */
 	private double tolerance = 0.05;
 
@@ -70,7 +70,7 @@ public class Comparator {
 			for (int col=0; col<width; col++){
 				try {
 					int rgb1 = image1.getPixel(col, row);
-					int rgb2= image2.getPixel(col + xOffset, row + yOffset);
+					int rgb2 = image2.getPixel(col + xOffset, row + yOffset);
 
 					int redDiff = Math.abs(Color.red(rgb1) - Color.red(rgb2));
 					int greenDiff = Math.abs(Color.green(rgb1) - Color.green(rgb2));
@@ -87,7 +87,7 @@ public class Comparator {
 								|| blueDiff > COLOR_DIFFERENCE_LOW) && totalDiff > COLOR_DIFFERENCE_LOW * 2.5)
 							diff += 0.25;
 				}
-				catch(ArrayIndexOutOfBoundsException exception) {			
+				catch(Exception exception) {			
 				}
 			}
 		}

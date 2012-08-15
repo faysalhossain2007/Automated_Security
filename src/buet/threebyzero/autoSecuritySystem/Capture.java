@@ -29,7 +29,8 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class Capture extends Activity {
-	private Bitmap image;
+	private Bitmap currentImage;
+	private Bitmap primaryImage;
 	private String imageFileName;
 	private File albumF;
 	private Camera camera;
@@ -37,8 +38,9 @@ public class Capture extends Activity {
 	private ToggleButton controlButton;
 	private int imageNumber = 0;
 	private Timer timer;
+	private Comparator imageComparator;
 	
-	private static final int INTERVAL = 5000;
+	private static final int INTERVAL = 10000;
 	private static final int INITIAL_DELAY = 2000;
 	private static final String CAMERA = "camera";
 	
@@ -62,6 +64,7 @@ public class Capture extends Activity {
 					stopCamera();
 			}
 		});
+		imageComparator = new Comparator();
 	}
 	
 	@Override
@@ -146,7 +149,7 @@ public class Capture extends Activity {
 		byte buf[] = new byte[1024];
 
 		ByteArrayOutputStream stream = new ByteArrayOutputStream();
-		image.compress(Bitmap.CompressFormat.PNG, 100, stream);
+		currentImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
 		byte[] byteArray = stream.toByteArray();
 
 		try {
@@ -162,16 +165,24 @@ public class Capture extends Activity {
 	
 	/** Returns the image captured most recently */
 	public Bitmap getImage() {
-		return image;
+		return currentImage;
 	}
 	
 	private class PictureProcessor implements PictureCallback{							
 		public void onPictureTaken(byte[] data, Camera camera) {
-			image = BitmapFactory.decodeByteArray(data, 0, data.length);
+			currentImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+			if(primaryImage == null)
+				primaryImage = Bitmap.createBitmap(currentImage);
 			Log.d(CAMERA, "Image captured: " + imageNumber);
-			Toast.makeText(getApplicationContext(), "Image: " + imageNumber, Toast.LENGTH_SHORT).show();
+			//Toast.makeText(getApplicationContext(), "Image: " + imageNumber, Toast.LENGTH_SHORT).show();
 			imageNumber++;
 			camera.startPreview();
+			
+			imageComparator.setImages(primaryImage, currentImage);
+			if(!imageComparator.isSame())
+				Toast.makeText(getApplicationContext(), "Not Same", Toast.LENGTH_SHORT).show();
+			else
+				Toast.makeText(getApplicationContext(), "Not Same", Toast.LENGTH_SHORT).show();
 		}
 	}
 }
