@@ -20,6 +20,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
@@ -51,6 +52,7 @@ public class Capture extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.photo);
 		preview = (SurfaceView) findViewById(R.id.preview);
+		preview.getHolder().setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 		controlButton = (ToggleButton) findViewById(R.id.controlButton);
 		controlButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			
@@ -58,6 +60,14 @@ public class Capture extends Activity {
 				if(isChecked) {
 					if(camera == null)
 						initializeCamera();
+					/*
+					Thread cameraThread = new Thread(new Runnable(){
+						public void run() {
+							startCamera();
+						}						
+					});
+					cameraThread.start();
+					*/
 					startCamera();
 				}
 				else
