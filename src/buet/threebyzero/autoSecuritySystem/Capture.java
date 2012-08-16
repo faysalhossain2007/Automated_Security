@@ -177,8 +177,8 @@ public class Capture extends Activity {
 			Thread imageProcessThread = new Thread(new Runnable() {
 				
 				public void run() {
-					Bitmap originalImage = BitmapFactory.decodeByteArray(data, 0, data.length);
-					currentImage = Bitmap.createScaledBitmap(originalImage, 120, 160, true);
+					currentImage = Bitmap.createScaledBitmap(BitmapFactory.decodeByteArray(data, 0, data.length)
+							, 120, 160, true);
 					if(primaryImage == null)
 						primaryImage = Bitmap.createBitmap(currentImage);
 					Log.d(CAMERA, "Image captured: " + imageNumber);
@@ -190,6 +190,7 @@ public class Capture extends Activity {
 						Log.d(CAMERA, "Same: " + imageComparator.difference);
 					else
 						Log.d(CAMERA, "Not Same: " + imageComparator.difference);
+					currentImage.recycle();
 				}
 			});
 			imageProcessThread.start();
