@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,7 +12,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.hardware.Camera;
@@ -22,10 +20,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -33,7 +28,6 @@ public class Capture extends Activity {
 	private Bitmap currentImage;
 	private Bitmap primaryImage;
 	private String imageFileName;
-	private File albumF;
 	private Camera camera;
 	private SurfaceView preview;
 	private ToggleButton controlButton;
@@ -41,8 +35,10 @@ public class Capture extends Activity {
 	private Timer timer;
 	private Comparator imageComparator;
 	
-	private static final int INTERVAL = 10000;
-	private static final int INITIAL_DELAY = 2000;
+	/** Interval time between capturing two consecutive pictures */
+	private static final int INTERVAL = 1000;
+	/** Amount of time before taking the first picture after start button is pressed */
+	private static final int INITIAL_DELAY = 1000;
 	private static final String CAMERA = "camera";
 	
 	/** Called when the activity is first created. */
@@ -92,6 +88,7 @@ public class Capture extends Activity {
 		}
 	}
 
+	/** Prepare the camera for the first time */
 	private void initializeCamera() {
 		camera = Camera.open();
 		try {
@@ -102,6 +99,7 @@ public class Capture extends Activity {
 		Log.d(CAMERA, "Camera initialized");
 	}
 	
+	/** Start showing preview and capturing pictures */
 	public void startCamera() {
 		camera.startPreview();
 		timer = new Timer();
@@ -119,6 +117,7 @@ public class Capture extends Activity {
 		}, INITIAL_DELAY, INTERVAL);
 	}
 	
+	/** Stop capturing pictures and showing the preview */
 	public void stopCamera() {
 		timer.cancel();
 		camera.stopPreview();
@@ -178,9 +177,11 @@ public class Capture extends Activity {
 		return currentImage;
 	}
 	
+	/** Processes the picture when image data is found after capturing the picture */
 	private class PictureProcessor implements PictureCallback{							
 		public void onPictureTaken(byte[] data, Camera camera) {
-			currentImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+			Bitmap originalImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+			currentImage = Bitmap.createScaledBitmap(originalImage, 120, 160, true);
 			if(primaryImage == null)
 				primaryImage = Bitmap.createBitmap(currentImage);
 			Log.d(CAMERA, "Image captured: " + imageNumber);
