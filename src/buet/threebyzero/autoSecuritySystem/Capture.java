@@ -100,8 +100,12 @@ public class Capture extends Activity {
 				camera.setOneShotPreviewCallback(new Camera.PreviewCallback() {
 					
 					public void onPreviewFrame(byte[] data, Camera camera) {
-						camera.takePicture(null, null, new PictureProcessor());
-						Log.d(CAMERA, "Picture taken");
+						try {
+							camera.takePicture(null, null, new PictureProcessor());
+							Log.d(CAMERA, "Picture taken");
+						} catch(RuntimeException exception) {
+							Log.e(CAMERA, "Camera already released", exception);
+						}
 					}
 				});
 			}
@@ -172,7 +176,11 @@ public class Capture extends Activity {
 	private class PictureProcessor implements PictureCallback{							
 		public void onPictureTaken(final byte[] data, Camera camera) {
 			Log.d(CAMERA, "Processed picture found");
-			camera.startPreview();
+			try {
+				camera.startPreview();
+			} catch(RuntimeException exception) {
+				Log.e(CAMERA, "Camera already released", exception);
+			}
 			
 			Thread imageProcessThread = new Thread(new Runnable() {
 				
