@@ -33,10 +33,9 @@ public class Capture extends Activity {
 	private ToggleButton controlButton;
 	private int imageNumber = 0;
 	private Timer timer;
-	private Comparator imageComparator;
 	
 	/** Interval time between capturing two consecutive pictures */
-	private static final int INTERVAL = 1000;
+	private static final int INTERVAL = 6000;
 	/** Amount of time before taking the first picture after start button is pressed */
 	private static final int INITIAL_DELAY = 1000;
 	private static final String CAMERA = "camera";
@@ -56,21 +55,12 @@ public class Capture extends Activity {
 				if(isChecked) {
 					if(camera == null)
 						initializeCamera();
-					/*
-					Thread cameraThread = new Thread(new Runnable(){
-						public void run() {
-							startCamera();
-						}						
-					});
-					cameraThread.start();
-					*/
 					startCamera();
 				}
 				else
 					stopCamera();
 			}
 		});
-		imageComparator = new Comparator();
 	}
 	
 	@Override
@@ -111,6 +101,7 @@ public class Capture extends Activity {
 					
 					public void onPreviewFrame(byte[] data, Camera camera) {
 						camera.takePicture(null, null, new PictureProcessor());
+						Log.d(CAMERA, "Picture taken");
 					}
 				});
 			}
@@ -179,21 +170,29 @@ public class Capture extends Activity {
 	
 	/** Processes the picture when image data is found after capturing the picture */
 	private class PictureProcessor implements PictureCallback{							
-		public void onPictureTaken(byte[] data, Camera camera) {
-			Bitmap originalImage = BitmapFactory.decodeByteArray(data, 0, data.length);
-			currentImage = Bitmap.createScaledBitmap(originalImage, 120, 160, true);
-			if(primaryImage == null)
-				primaryImage = Bitmap.createBitmap(currentImage);
-			Log.d(CAMERA, "Image captured: " + imageNumber);
-			//Toast.makeText(getApplicationContext(), "Image: " + imageNumber, Toast.LENGTH_SHORT).show();
-			imageNumber++;
+		public void onPictureTaken(final byte[] data, Camera camera) {
+			Log.d(CAMERA, "Processed picture found");
 			camera.startPreview();
 			
-			imageComparator.setImages(primaryImage, currentImage);
-			if(!imageComparator.isSame())
-				Toast.makeText(getApplicationContext(), "Not Same", Toast.LENGTH_SHORT).show();
-			else
-				Toast.makeText(getApplicationContext(), "Not Same", Toast.LENGTH_SHORT).show();
+			Thread imageProcessThread = new Thread(new Runnable() {
+				
+				public void run() {
+					Bitmap originalImage = BitmapFactory.decodeByteArray(data, 0, data.length);
+					currentImage = Bitmap.createScaledBitmap(originalImage, 120, 160, true);
+					if(primaryImage == null)
+						primaryImage = Bitmap.createBitmap(currentImage);
+					Log.d(CAMERA, "Image captured: " + imageNumber);
+					imageNumber++;
+					
+					Comparator imageComparator = new Comparator();
+					imageComparator.setImages(primaryImage, currentImage);
+					if(imageComparator.isSame())
+						Log.d(CAMERA, "Same: " + imageComparator.difference);
+					else
+						Log.d(CAMERA, "Not Same: " + imageComparator.difference);
+				}
+			});
+			imageProcessThread.start();
 		}
 	}
 }

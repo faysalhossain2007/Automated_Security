@@ -3,9 +3,6 @@
 package buet.threebyzero.autoSecuritySystem;
 
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
@@ -21,9 +18,11 @@ public class Comparator {
 	private int height;
 
 	/** Denotes the maximum amount of possible displacement between two images in pixels. */
-	private int shakeLevel = 2;
+	private int shakeLevel = 1;
 	/** Denotes the maximum amount of accepted error rate. */
 	private double tolerance = 0.05;
+	/** Denotes the current relative difference between the two images */
+	public double difference;
 
 	/** Prepares the Comparator with two {@link Bitmap} objects */
 	public void setImages(Bitmap image1, Bitmap image2) {
@@ -45,7 +44,8 @@ public class Comparator {
 	 * @return {@code True} if any of the level of image2 matches with image1
 	 */
 	public boolean isSame() {
-
+		
+		difference = 1.0;
 		for(int xOffset = shakeLevel; xOffset >= -shakeLevel; xOffset--)
 			for(int yOffset = shakeLevel; yOffset >= -shakeLevel; yOffset--)
 				if(isLevelSame(xOffset, yOffset))
@@ -64,7 +64,7 @@ public class Comparator {
 	 *  from the RGB values of the images in an approximate manner.  
 	 */
 	public boolean isLevelSame(int xOffset, int yOffset) {
-		double diff = 0;
+		double differencePoints = 0;
 
 		for (int row=0; row<height; row++){
 			for (int col=0; col<width; col++){
@@ -79,13 +79,13 @@ public class Comparator {
 
 					if(redDiff > COLOR_DIFFERENCE_HIGH || greenDiff > COLOR_DIFFERENCE_HIGH 
 							|| blueDiff > COLOR_DIFFERENCE_HIGH)
-							diff += 1.0;
+							differencePoints += 1.0;
 					else if((redDiff > COLOR_DIFFERENCE_MEDIUM || greenDiff > COLOR_DIFFERENCE_MEDIUM 
 							|| blueDiff > COLOR_DIFFERENCE_MEDIUM) && totalDiff > COLOR_DIFFERENCE_MEDIUM * 2)
-						diff += 0.5;
+						differencePoints += 0.5;
 					else if((redDiff > COLOR_DIFFERENCE_LOW || greenDiff > COLOR_DIFFERENCE_LOW 
 								|| blueDiff > COLOR_DIFFERENCE_LOW) && totalDiff > COLOR_DIFFERENCE_LOW * 2.5)
-							diff += 0.25;
+							differencePoints += 0.25;
 				}
 				catch(Exception exception) {			
 				}
@@ -93,8 +93,10 @@ public class Comparator {
 		}
 
 		double area = width * height;
-		System.out.println(diff / area);
-		if(diff / area > tolerance)
+		double currentDifference = differencePoints / area;
+		if(difference > currentDifference)
+			difference = currentDifference;
+		if(currentDifference > tolerance)
 			return false;
 		else return true;
 	}
