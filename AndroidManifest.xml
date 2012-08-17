@@ -34,7 +34,7 @@
             android:label="@string/app_name" >
         </activity>
          <activity
-            android:name=".SmsSend"
+            android:name=".SmsSender"
             android:label="@string/app_name" >
         </activity>
          <activity
