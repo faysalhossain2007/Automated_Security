@@ -3,5 +3,6 @@
 
     <string name="hello">Hello World, Camera!</string>
     <string name="app_name">Automated_Security</string>
+    <string name="startCameraDialogTitle">Select Mode</string>
 
 </resources>

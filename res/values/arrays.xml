@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="modes">
+        <item >"Passive Mode"</item>
+        <item >"Alert Mode"</item>
+        <item >"Spy Mode"</item>
+    </string-array>
+    
+</resources>
