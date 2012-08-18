@@ -24,9 +24,9 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-public class Capture extends Activity {
-	private Bitmap currentImage;
-	private Bitmap primaryImage;
+public abstract class Capture extends Activity {
+	protected Bitmap currentImage;
+	protected Bitmap primaryImage;
 	private String imageFileName;
 	private Camera camera;
 	private SurfaceView preview;
@@ -38,7 +38,7 @@ public class Capture extends Activity {
 	private static final int INTERVAL = 6000;
 	/** Amount of time before taking the first picture after start button is pressed */
 	private static final int INITIAL_DELAY = 1000;
-	private static final String CAMERA = "camera";
+	private static final String LOG_TAG = "camera";
 	
 	/** Called when the activity is first created. */
 
@@ -84,9 +84,9 @@ public class Capture extends Activity {
 		try {
 			camera.setPreviewDisplay(preview.getHolder());
 		} catch (IOException exception) {
-			Log.e(CAMERA, "Cannot set display", exception);
+			Log.e(LOG_TAG, "Cannot set display", exception);
 		}
-		Log.d(CAMERA, "Camera initialized");
+		Log.d(LOG_TAG, "Camera initialized");
 	}
 	
 	/** Start showing preview and capturing pictures */
@@ -102,9 +102,9 @@ public class Capture extends Activity {
 					public void onPreviewFrame(byte[] data, Camera camera) {
 						try {
 							camera.takePicture(null, null, new PictureProcessor());
-							Log.d(CAMERA, "Picture taken");
+							Log.d(LOG_TAG, "Picture taken");
 						} catch(RuntimeException exception) {
-							Log.e(CAMERA, "Camera already released", exception);
+							Log.e(LOG_TAG, "Camera already released", exception);
 						}
 					}
 				});
@@ -117,6 +117,9 @@ public class Capture extends Activity {
 		timer.cancel();
 		camera.stopPreview();
 	}
+	
+	/** Processes the picture (sending the image to the server, send warning etc.) */
+	public abstract void processPicture(); 
 
 	public File fileCreate() {
 
@@ -135,7 +138,7 @@ public class Capture extends Activity {
 			e.printStackTrace();
 		}
 		
-		Log.d(CAMERA, "File created");
+		Log.d(LOG_TAG, "File created");
 		return imageF;
 	}
 
@@ -163,7 +166,7 @@ public class Capture extends Activity {
 			e.printStackTrace();
 			return false;
 		}
-		Log.d(CAMERA, "Image Saved");
+		Log.d(LOG_TAG, "Image Saved");
 		return true;
 	}
 	
@@ -175,11 +178,11 @@ public class Capture extends Activity {
 	/** Processes the picture when image data is found after capturing the picture */
 	private class PictureProcessor implements PictureCallback{							
 		public void onPictureTaken(final byte[] data, Camera camera) {
-			Log.d(CAMERA, "Processed picture found");
+			Log.d(LOG_TAG, "Processed picture found");
 			try {
 				camera.startPreview();
 			} catch(RuntimeException exception) {
-				Log.e(CAMERA, "Camera already released", exception);
+				Log.e(LOG_TAG, "Camera already released", exception);
 			}
 			
 			Thread imageProcessThread = new Thread(new Runnable() {
@@ -189,15 +192,10 @@ public class Capture extends Activity {
 							, 120, 160, true);
 					if(primaryImage == null)
 						primaryImage = Bitmap.createBitmap(currentImage);
-					Log.d(CAMERA, "Image captured: " + imageNumber);
+					Log.d(LOG_TAG, "Image captured: " + imageNumber);
 					imageNumber++;
 					
-					Comparator imageComparator = new Comparator();
-					imageComparator.setImages(primaryImage, currentImage);
-					if(imageComparator.isSame())
-						Log.d(CAMERA, "Same: " + imageComparator.difference);
-					else
-						Log.d(CAMERA, "Not Same: " + imageComparator.difference);
+					processPicture();
 					currentImage.recycle();
 				}
 			});
