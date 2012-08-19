@@ -1,23 +1,11 @@
 package buet.threebyzero.autoSecuritySystem;
 
-import android.util.Log;
 
 
-public class SpyMode extends Capture {
-
-	private static final String LOG_TAG = "Spy Mode";
+public class SpyMode extends ActiveMode {
 
 	@Override
-	public void processPicture() {
-		Comparator imageComparator = new Comparator();
-		imageComparator.setImages(primaryImage, currentImage);
-		Log.d(LOG_TAG, imageComparator.difference + "");
-		
-		if(!imageComparator.isSame())
-			sendPicture();
-	}
-
-	private void sendPicture() {
+	protected void sendWarning() {
 		
 	}
 }
