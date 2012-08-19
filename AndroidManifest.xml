@@ -22,11 +22,19 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".Menu"
+            android:name="Capture"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="Capture"
+            android:name="PassiveMode"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="AlertMode"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="SpyMode"
             android:label="@string/app_name" >
         </activity>
         <activity

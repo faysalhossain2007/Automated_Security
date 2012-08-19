@@ -51,13 +51,13 @@ public class Main extends Activity{
 		    	Intent startCameraIntent = null;
 				switch(choice) {
 				case 0:
-					startCameraIntent = new Intent(getBaseContext(), Capture.class);
+					startCameraIntent = new Intent(getBaseContext(), PassiveMode.class);
 			    	break;
 				case 1:
-					startCameraIntent = new Intent(getBaseContext(), Capture.class);
+					startCameraIntent = new Intent(getBaseContext(), AlertMode.class);
 			    	break;
 				case 2:
-					startCameraIntent = new Intent(getBaseContext(), Capture.class);
+					startCameraIntent = new Intent(getBaseContext(), SpyMode.class);
 			    	break;
 				}
 				if(startCameraIntent != null)
